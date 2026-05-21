@@ -1,0 +1,71 @@
+<div class="nav-bar"></div>
+
+<div class="container">
+  <div *ngIf="currentStep === 0" class="intro-screen">
+    <h1>Self-Criticism and Self-Compassion Scale</h1>
+    <p>
+      You will be presented with several statements describing various situations. Accompanying each
+      statement is a list of possible reactions that you may have in response to yourself during
+      these situations. We would like you to rate on the scales the extent to which you would react
+      to yourself in a specific manner in response to each situation, as if the situation were
+      happening to you at this moment in time. Try to imagine each situation occurring as vividly as
+      possible.
+    </p>
+    <button type="button" (click)="nextQuestion()">Start Test</button>
+  </div>
+
+  <div class="progress-section" *ngIf="currentStep > 0 && currentStep <= questions.length">
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" [style.width.%]="progressPercentage"></div>
+    </div>
+
+    <div class="progress-text">Question {{ currentStep }} of {{ questions.length }}</div>
+  </div>
+
+  <div class="question-card" *ngIf="currentStep > 0 && currentStep <= questions.length">
+    <h2>
+      {{ currentQuestion.id }}.
+
+      {{ currentQuestion.situation }}
+    </h2>
+
+    <div class="reaction-row" *ngFor="let reaction of reactions">
+      <div class="reaction-label">
+        {{ reaction }}
+      </div>
+
+      <div class="scale-options">
+        <label class="scale-item" *ngFor="let value of scaleValues">
+          <input
+            type="radio"
+            [name]="'question_' + currentQuestion.id + '_' + reaction"
+            [value]="value"
+            [(ngModel)]="answers[currentQuestion.id][reaction]"
+          />
+
+          <span class="scale-marker"></span>
+
+          <span class="scale-number">
+            {{ value }}
+          </span>
+        </label>
+      </div>
+    </div>
+
+    <div class="navigation-buttons">
+      <div class="previous-btn">
+        <button type="button" *ngIf="currentStep > 1" (click)="previousQuestion()">Previous</button>
+      </div>
+
+      <button type="button" (click)="nextQuestion()">
+        {{ currentStep === questions.length ? 'Finish' : 'Next' }}
+      </button>
+    </div>
+  </div>
+
+  <div class="final-screen" *ngIf="currentStep > questions.length">
+    <h2>You have completed the questionnaire.</h2>
+
+    <button type="button" (click)="onSubmit()">Submit Test</button>
+  </div>
+</div>
