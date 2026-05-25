@@ -29,33 +29,44 @@
       {{ currentQuestion.situation }}
     </h2>
 
+    <div class="scale-header">
+      <div class="scale-header-spacer"></div>
+
+      <div class="scale-header-labels">
+        <span>Not at all</span>
+
+        <span>Highly</span>
+      </div>
+    </div>
+
     <div class="reaction-row" *ngFor="let reaction of reactions">
       <div class="reaction-label">
         {{ reaction }}
       </div>
 
-      <div class="scale-options">
-        <label class="scale-item" *ngFor="let value of scaleValues">
-          <input
-            type="radio"
-            [name]="'question_' + currentQuestion.id + '_' + reaction"
-            [value]="value"
-            [(ngModel)]="answers[currentQuestion.id][reaction]"
-          />
+      <div class="scale-wrapper">
+        <div class="scale-options">
+          <label class="scale-item" *ngFor="let value of scaleValues">
+            <input
+              type="radio"
+              [name]="'question_' + currentQuestion.id + '_' + reaction"
+              [value]="value"
+              [(ngModel)]="answers[currentQuestion.id][reaction]"
+            />
 
-          <span class="scale-marker"></span>
-
-          <span class="scale-number">
-            {{ value }}
-          </span>
-        </label>
+            <span
+              class="scale-block"
+              [class.active]="value == answers[currentQuestion.id][reaction]"
+            >
+              {{ value }}
+            </span>
+          </label>
+        </div>
       </div>
     </div>
 
     <div class="navigation-buttons">
-      <div class="previous-btn">
-        <button type="button" *ngIf="currentStep > 1" (click)="previousQuestion()">Previous</button>
-      </div>
+      <button type="button" *ngIf="currentStep > 1" (click)="previousQuestion()">Previous</button>
 
       <button type="button" (click)="nextQuestion()">
         {{ currentStep === questions.length ? 'Finish' : 'Next' }}

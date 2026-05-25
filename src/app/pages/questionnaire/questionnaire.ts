@@ -1,27 +1,33 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormsModule,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  Validators,
-} from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 
 @Component({
   selector: 'app-questionnaire',
-  imports: [CommonModule, ReactiveFormsModule, FormsModule],
+  imports: [CommonModule, FormsModule, HttpClientModule],
   templateUrl: './questionnaire.html',
   styleUrl: './questionnaire.css',
 })
 export class Questionnaire {
-  constructor() {
+  constructor(private http: HttpClient) {
+    // this.getQuestionnaire();
+
     this.questions.forEach((question) => {
       this.answers[question.id] = {};
+
+      this.reactions.forEach((reaction) => {
+        this.answers[question.id][reaction] = 1;
+      });
     });
   }
 
-  currentStep = 0;
+  // getQuestionnaire() {
+  //   this.http.get('http://172.26.182.130:8000/api/questionnaires/1/').subscribe((response) => {
+  //     this.questions = response.questions;
+  //     console.log(this.questions);
+  //   });
+  // }
 
   questions = [
     {
@@ -50,47 +56,43 @@ export class Questionnaire {
   reactions = ['Reassuring', 'Soothing', 'Contemptuous', 'Compassionate', 'Critical', 'Harsh'];
   scaleValues = [1, 2, 3, 4, 5, 6, 7];
 
+  currentStep = 0;
+
+  // questions: any[] = [];
+
   answers: any = {};
 
   get currentQuestion() {
     return this.questions[this.currentStep - 1];
   }
 
+  visitedQuestions = new Set<number>();
+
   nextQuestion() {
-    if (this.currentStep > 0 && !this.isCurrentQuestionAnswered()) {
-      alert('Please answer all reactions.');
-
-      return;
-    }
-
     this.currentStep++;
 
-    if (this.currentStep <= this.questions.length) {
-      const hasAnswered = this.reactions.some(
-        (reaction) => this.answers[this.currentQuestion.id][reaction],
-      );
+    if (this.currentStep <= this.questions.length && !this.visitedQuestions.has(this.currentStep)) {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+      });
 
-      if (!hasAnswered) {
-        window.scrollTo({
-          top: 0,
-          behavior: 'smooth',
-        });
-      }
+      this.visitedQuestions.add(this.currentStep);
+    } else {
+      this.scrollToBottom();
     }
   }
 
   previousQuestion() {
     this.currentStep--;
+
+    this.scrollToBottom();
   }
 
-  isCurrentQuestionAnswered(): boolean {
-    const currentAnswers = this.answers[this.currentQuestion.id];
-
-    if (!currentAnswers) {
-      return false;
-    }
-
-    return this.reactions.every((reaction) => currentAnswers[reaction]);
+  scrollToBottom() {
+    requestAnimationFrame(() => {
+      window.scrollTo(0, document.body.scrollHeight);
+    });
   }
 
   onSubmit() {
