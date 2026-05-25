@@ -11,59 +11,57 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 })
 export class Questionnaire {
   constructor(private http: HttpClient) {
-    // this.getQuestionnaire();
+    this.getQuestionnaire();
+  }
 
-    this.questions.forEach((question) => {
-      this.answers[question.id] = {};
+  getQuestionnaire() {
+    this.http.get('http://172.26.182.130:8000/api/questionnaires/1/').subscribe((response: any) => {
+      this.questions = response.questions;
 
-      this.reactions.forEach((reaction) => {
-        this.answers[question.id][reaction] = 1;
+      this.groupQuestions();
+
+      this.initializeAnswers();
+    });
+  }
+
+  groupQuestions() {
+    this.groupedQuestions = [];
+
+    for (let i = 0; i < this.questions.length; i += 6) {
+      const group = this.questions.slice(i, i + 6);
+
+      const scenarioText = group[0].text
+        .split('|')[0]
+        .replace(/\[Scenario \d+\]/, '')
+        .replace('&#8377;', '₹')
+        .trim();
+
+      this.groupedQuestions.push({
+        scenario: scenarioText,
+
+        reactions: group,
+      });
+    }
+  }
+
+  initializeAnswers() {
+    this.groupedQuestions.forEach((question: any) => {
+      question.reactions.forEach((reaction: any) => {
+        this.answers[reaction.id] = reaction.choices[0].id;
       });
     });
   }
 
-  // getQuestionnaire() {
-  //   this.http.get('http://172.26.182.130:8000/api/questionnaires/1/').subscribe((response) => {
-  //     this.questions = response.questions;
-  //     console.log(this.questions);
-  //   });
-  // }
-
-  questions = [
-    {
-      id: 1,
-      situation: 'You arrive home to find that you have left your keys at work.',
-    },
-    {
-      id: 2,
-      situation: 'You receive a letter in the post that is an unpaid bill reminder.',
-    },
-    {
-      id: 3,
-      situation: 'You have just dropped and scratched your new smartphone.',
-    },
-    {
-      id: 4,
-      situation:
-        'You have just opened the washing machine door to find that your white wash has turned pink.',
-    },
-    {
-      id: 5,
-      situation: 'After searching your bag, you realize that you have lost a £20 note.',
-    },
-  ];
-
-  reactions = ['Reassuring', 'Soothing', 'Contemptuous', 'Compassionate', 'Critical', 'Harsh'];
-  scaleValues = [1, 2, 3, 4, 5, 6, 7];
-
   currentStep = 0;
 
-  // questions: any[] = [];
+  questions: any[] = [];
+
+  groupedQuestions: any[] = [];
 
   answers: any = {};
 
   get currentQuestion() {
-    return this.questions[this.currentStep - 1];
+    return this.groupedQuestions[this.currentStep - 1];
   }
 
   visitedQuestions = new Set<number>();
@@ -102,6 +100,6 @@ export class Questionnaire {
   }
 
   get progressPercentage(): number {
-    return ((this.currentStep - 1) / this.questions.length) * 100;
+    return ((this.currentStep - 1) / this.groupedQuestions.length) * 100;
   }
 }

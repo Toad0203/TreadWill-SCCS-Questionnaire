@@ -14,19 +14,17 @@
     <button type="button" (click)="nextQuestion()">Start Test</button>
   </div>
 
-  <div class="progress-section" *ngIf="currentStep > 0 && currentStep <= questions.length">
+  <div class="progress-section" *ngIf="currentStep > 0 && currentStep <= groupedQuestions.length">
     <div class="progress-bar-container">
       <div class="progress-bar-fill" [style.width.%]="progressPercentage"></div>
     </div>
 
-    <div class="progress-text">Question {{ currentStep }} of {{ questions.length }}</div>
+    <div class="progress-text">Question {{ currentStep }} of {{ groupedQuestions.length }}</div>
   </div>
 
-  <div class="question-card" *ngIf="currentStep > 0 && currentStep <= questions.length">
+  <div class="question-card" *ngIf="currentStep > 0 && currentStep <= groupedQuestions.length">
     <h2>
-      {{ currentQuestion.id }}.
-
-      {{ currentQuestion.situation }}
+      {{ currentQuestion.scenario }}
     </h2>
 
     <div class="scale-header">
@@ -39,26 +37,23 @@
       </div>
     </div>
 
-    <div class="reaction-row" *ngFor="let reaction of reactions">
+    <div class="reaction-row" *ngFor="let reaction of currentQuestion.reactions">
       <div class="reaction-label">
-        {{ reaction }}
+        {{ reaction.text.split('|')[1].trim() }}
       </div>
 
       <div class="scale-wrapper">
         <div class="scale-options">
-          <label class="scale-item" *ngFor="let value of scaleValues">
+          <label class="scale-item" *ngFor="let choice of reaction.choices">
             <input
               type="radio"
               [name]="'question_' + currentQuestion.id + '_' + reaction"
-              [value]="value"
-              [(ngModel)]="answers[currentQuestion.id][reaction]"
+              [value]="choice.id"
+              [(ngModel)]="answers[reaction.id]"
             />
 
-            <span
-              class="scale-block"
-              [class.active]="value == answers[currentQuestion.id][reaction]"
-            >
-              {{ value }}
+            <span class="scale-block" [class.active]="choice.id == answers[reaction.id]">
+              {{ choice.score }}
             </span>
           </label>
         </div>
@@ -74,7 +69,7 @@
     </div>
   </div>
 
-  <div class="final-screen" *ngIf="currentStep > questions.length">
+  <div class="final-screen" *ngIf="currentStep > groupedQuestions.length">
     <h2>You have completed the questionnaire.</h2>
 
     <button type="button" (click)="onSubmit()">Submit Test</button>
