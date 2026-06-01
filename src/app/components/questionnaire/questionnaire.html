@@ -1,0 +1,112 @@
+<div class="container">
+  <div *ngIf="currentStep === 0" class="intro-screen">
+    <h1>{{ (questionnaireData$ | async)?.title }}</h1>
+    <p>
+      {{ (questionnaireData$ | async)?.instructions }}
+    </p>
+    <button type="button" (click)="nextQuestion()">Start Test</button>
+  </div>
+
+  <div class="progress-section" *ngIf="currentQuestion">
+    <div class="progress-bar-container">
+      <div class="progress-bar-fill" [style.width.%]="progressPercentage"></div>
+    </div>
+
+    <div class="progress-text">Question {{ currentStep }} of {{ groupedQuestions.length }}</div>
+  </div>
+
+  <div
+    class="question-card"
+    [class.fscrs-card]="questionnaireType === 'fscrs'"
+    *ngIf="currentStep > 0 && currentStep <= groupedQuestions.length"
+  >
+    <h2>
+      {{ currentQuestion.title }}
+    </h2>
+
+    <div *ngIf="questionnaireType === 'sccs'" class="scale-header top-labels">
+      <div class="scale-header-spacer"></div>
+
+      <div class="scale-header-labels sccs-end-labels">
+        <span>{{ currentQuestion.reactions[0].choices[0].text }}</span>
+
+        <span>
+          {{
+            currentQuestion.reactions[0].choices[currentQuestion.reactions[0].choices.length - 1]
+              .text
+          }}
+        </span>
+      </div>
+    </div>
+
+    <ng-container *ngFor="let reaction of currentQuestion.reactions; let i = index">
+      <div class="reaction-row">
+        <div class="reaction-label" *ngIf="reaction.reaction">
+          {{ reaction.reaction }}
+        </div>
+
+        <div class="scale-wrapper">
+          <div class="scale-options" [class.fscrs-scale]="questionnaireType === 'fscrs'">
+            <label
+              class="scale-item"
+              [class.fscrs-scale-item]="questionnaireType === 'fscrs'"
+              *ngFor="let choice of reaction.choices"
+            >
+              <input
+                type="radio"
+                [name]="'question_' + currentQuestion.id + '_' + reaction"
+                [value]="choice.id"
+                [(ngModel)]="answers[reaction.id]"
+                (change)="showValidationError = false"
+              />
+
+              <span
+                class="scale-block"
+                [class.fscrs-scale-block]="questionnaireType === 'fscrs'"
+                [class.active]="choice.id == answers[reaction.id]"
+              >
+                <ng-container *ngIf="questionnaireType === 'fscrs'; else sccsBlock">
+                  <span class="choice-text">{{ choice.text }}</span>
+                  <span class="choice-score">({{ choice.score }})</span>
+                </ng-container>
+
+                <ng-template #sccsBlock>
+                  {{ choice.score }}
+                </ng-template>
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="i == 0" class="scale-header bottom-labels">
+        <div *ngIf="questionnaireType === 'sccs'" class="scale-header-spacer"></div>
+
+        <div class="scale-header-labels">
+          <span
+            *ngFor="let choice of currentQuestion?.reactions?.[0]?.choices"
+            [hidden]="questionnaireType === 'fscrs' || (choice.score !== 1 && choice.score !== 7)"
+          >
+            {{ choice.text }}
+          </span>
+        </div>
+      </div>
+    </ng-container>
+
+    <div class="navigation-buttons">
+      <button type="button" *ngIf="currentStep > 1" (click)="previousQuestion()">Previous</button>
+
+      <button type="button" (click)="nextQuestion()">
+        {{ currentStep === questions.length ? 'Finish' : 'Next' }}
+      </button>
+    </div>
+    <p class="validation-error" *ngIf="showValidationError">
+      Please answer all questions before proceeding
+    </p>
+  </div>
+
+  <div class="final-screen" *ngIf="currentStep > groupedQuestions.length">
+    <h2>You have completed the questionnaire.</h2>
+
+    <button type="button" (click)="onSubmit()">Submit Test</button>
+  </div>
+</div>
