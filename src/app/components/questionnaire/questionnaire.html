@@ -39,60 +39,92 @@
       </div>
     </div>
 
-    <ng-container *ngFor="let reaction of currentQuestion.reactions; let i = index">
-      <div class="reaction-row">
-        <div class="reaction-label" *ngIf="reaction.reaction">
-          {{ reaction.reaction }}
-        </div>
+    @if (questionnaireType === 'vas') {
+      <ng-container>
+        <div class="vas-value">{{ answers[currentQuestion.id] ?? '-' }}</div>
 
-        <div class="scale-wrapper">
-          <div class="scale-options" [class.fscrs-scale]="questionnaireType === 'fscrs'">
-            <label
-              class="scale-item"
-              [class.fscrs-scale-item]="questionnaireType === 'fscrs'"
-              *ngFor="let choice of reaction.choices"
-            >
-              <input
-                type="radio"
-                [name]="'question_' + currentQuestion.id + '_' + reaction"
-                [value]="choice.id"
-                [(ngModel)]="answers[reaction.id]"
-                (change)="showValidationError = false"
-              />
+        <div class="vas-row">
+          <span class="vas-label">
+            {{ currentQuestion.choices[0].text }}
+          </span>
 
-              <span
-                class="scale-block"
-                [class.fscrs-scale-block]="questionnaireType === 'fscrs'"
-                [class.active]="choice.id == answers[reaction.id]"
-              >
-                <ng-container *ngIf="questionnaireType === 'fscrs'; else sccsBlock">
-                  <span class="choice-text">{{ choice.text }}</span>
-                  <span class="choice-score">({{ choice.score }})</span>
-                </ng-container>
+          <div class="vas-scale" (click)="onScaleClick($event)">
+            <div class="vas-track">
+              <div class="vas-fill" [style.width.%]="answers[currentQuestion.id] ?? 0"></div>
 
-                <ng-template #sccsBlock>
-                  {{ choice.score }}
-                </ng-template>
-              </span>
-            </label>
+              <div
+                class="vas-marker"
+                *ngIf="answers[currentQuestion.id] != null"
+                [style.left.%]="answers[currentQuestion.id]"
+              ></div>
+            </div>
           </div>
-        </div>
-      </div>
-      <div *ngIf="i == 0" class="scale-header bottom-labels">
-        <div *ngIf="questionnaireType === 'sccs'" class="scale-header-spacer"></div>
 
-        <div class="scale-header-labels">
-          <span
-            *ngFor="let choice of currentQuestion?.reactions?.[0]?.choices"
-            [hidden]="questionnaireType === 'fscrs' || (choice.score !== 1 && choice.score !== 7)"
-          >
-            {{ choice.text }}
+          <span class="vas-label">
+            {{ currentQuestion.choices[1].text }}
           </span>
         </div>
-      </div>
-    </ng-container>
+        <div class="vas-label-mobile">
+          <span>{{ currentQuestion.choices[0].text }}</span>
+          <span>{{ currentQuestion.choices[1].text }}</span>
+        </div>
+      </ng-container>
+    } @else {
+      <ng-container *ngFor="let reaction of currentQuestion.reactions; let i = index">
+        <div class="reaction-row">
+          <div class="reaction-label" *ngIf="reaction.reaction">
+            {{ reaction.reaction }}
+          </div>
 
-    <div class="navigation-buttons">
+          <div class="scale-wrapper">
+            <div class="scale-options" [class.fscrs-scale]="questionnaireType === 'fscrs'">
+              <label
+                class="scale-item"
+                [class.fscrs-scale-item]="questionnaireType === 'fscrs'"
+                *ngFor="let choice of reaction.choices"
+              >
+                <input
+                  type="radio"
+                  [name]="'question_' + currentQuestion.id + '_' + reaction"
+                  [value]="choice.id"
+                  [(ngModel)]="answers[reaction.id]"
+                  (change)="showValidationError = false"
+                />
+
+                <span
+                  class="scale-block"
+                  [class.fscrs-scale-block]="questionnaireType === 'fscrs'"
+                  [class.active]="choice.id == answers[reaction.id]"
+                >
+                  <ng-container *ngIf="questionnaireType === 'fscrs'; else sccsBlock">
+                    <span class="choice-text">{{ choice.text }}</span>
+                    <span class="choice-score">({{ choice.score }})</span>
+                  </ng-container>
+
+                  <ng-template #sccsBlock>
+                    {{ choice.score }}
+                  </ng-template>
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div *ngIf="i == 0" class="scale-header bottom-labels">
+          <div *ngIf="questionnaireType === 'sccs'" class="scale-header-spacer"></div>
+
+          <div class="scale-header-labels">
+            <span
+              *ngFor="let choice of currentQuestion?.reactions?.[0]?.choices"
+              [hidden]="questionnaireType === 'fscrs' || (choice.score !== 1 && choice.score !== 7)"
+            >
+              {{ choice.text }}
+            </span>
+          </div>
+        </div>
+      </ng-container>
+    }
+
+    <div class="navigation-buttons" *ngIf="questionnaireType !== 'vas'">
       <button type="button" *ngIf="currentStep > 1" (click)="previousQuestion()">Previous</button>
 
       <button type="button" (click)="nextQuestion()">

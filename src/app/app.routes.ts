@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { SccsPage } from './pages/sccs-page/sccs-page';
 import { FscrsPage } from './pages/fscrs-page/fscrs-page';
 import { HomePage } from './pages/home-page/home-page';
+import { VasPage } from './pages/vas-page/vas-page';
 
 export const routes: Routes = [
   {
@@ -16,5 +17,9 @@ export const routes: Routes = [
   {
     path: 'fscrs-questionnaire',
     component: FscrsPage,
+  },
+  {
+    path: 'vas-questionnaire',
+    component: VasPage,
   },
 ];
