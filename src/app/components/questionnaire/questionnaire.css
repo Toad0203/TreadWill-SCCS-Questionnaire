@@ -235,18 +235,24 @@ button {
   display: none;
 }
 
-.vas-value {
-  text-align: center;
-  font-size: 40px;
+.vas-value-label {
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  font-size: 1rem;
   font-weight: 600;
-  margin-bottom: 2rem;
+
+  white-space: nowrap;
 }
 
 .vas-track {
   position: relative;
   width: 100%;
-  height: 12px;
-  background: #d3d3d3;
+  height: 20px;
+  background: #f5bb56;
   border-radius: 999px;
   overflow: visible;
 }
@@ -273,11 +279,11 @@ button {
   background: #f5bb56;
   border-radius: 999px;
 
-  transition: width 500ms ease;
+  transition: width 250ms ease;
 }
 
 .vas-marker {
-  transition: left 500ms ease;
+  transition: left 250ms ease;
 }
 
 @media (max-width: 768px) {
@@ -389,5 +395,9 @@ button {
     display: flex;
     justify-content: space-between;
     margin-top: 8px;
+  }
+
+  .vas-scale {
+    margin-top: 50px;
   }
 }

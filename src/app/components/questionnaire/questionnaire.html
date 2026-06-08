@@ -41,8 +41,6 @@
 
     @if (questionnaireType === 'vas') {
       <ng-container>
-        <div class="vas-value">{{ answers[currentQuestion.id] ?? '-' }}</div>
-
         <div class="vas-row">
           <span class="vas-label">
             {{ currentQuestion.choices[0].text }}
@@ -56,7 +54,11 @@
                 class="vas-marker"
                 *ngIf="answers[currentQuestion.id] != null"
                 [style.left.%]="answers[currentQuestion.id]"
-              ></div>
+              >
+                <span class="vas-value-label">
+                  {{ answers[currentQuestion.id] }}
+                </span>
+              </div>
             </div>
           </div>
 

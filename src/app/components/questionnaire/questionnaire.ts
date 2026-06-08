@@ -27,10 +27,10 @@ export class Questionnaire implements OnInit {
     this.getQuestionnaire();
   }
 
+  url = 'http://10.10.10.41:8000/api/questionnaires';
+
   getQuestionnaire() {
-    this.questionnaireData$ = this.http.get(
-      `http://10.10.10.13:8000/api/questionnaires/${this.questionnaireId}/`,
-    );
+    this.questionnaireData$ = this.http.get(`${this.url}/${this.questionnaireId}/`);
 
     this.questionnaireData$.subscribe((response: any) => {
       this.questions = response.questions;
@@ -151,7 +151,7 @@ export class Questionnaire implements OnInit {
 
     console.log(payload);
 
-    this.http.post('http://10.10.10.41:8000/api/questionnaires/submit/', payload).subscribe({
+    this.http.post(`${this.url}/submit/`, payload).subscribe({
       next: (response) => {
         console.log(response);
         alert('Questionnaire submitted successfully.');
@@ -204,7 +204,7 @@ export class Questionnaire implements OnInit {
       this.nextQuestion();
 
       this.cdr.detectChanges();
-    }, 500);
+    }, 750);
   }
 
   get sliderBackground() {
